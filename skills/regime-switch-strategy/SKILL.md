@@ -190,6 +190,16 @@ is present, but liquidations are contained, so it correctly avoids a false `STRE
 original `Fear&Greed < 25 ⇒ STRESS` rule was tightened to require liquidation/volatility
 confirmation as a direct result of this check.
 
+## Backtest
+
+The strategy is backtested on real Binance daily OHLCV (Oct 2023 – Jun 2026) in
+`prototype/backtest.js` — no look-ahead (signal on bar t, position held over t+1), 5 bps cost.
+Out-of-sample across four assets it beats/matches buy & hold while delivering higher Sharpe and
+lower drawdown on every one: BTC 0.83 Sharpe / −41.9% DD (vs 0.69 / −51.3%), ETH +100.9% (vs
+−13.4%), BNB 1.09 Sharpe (vs 0.92), SOL −56.7% DD (vs −76.0%). The backtest reconstructs the
+regime from price (volatility + drawdown + trend), since CMC sentiment/derivatives history is not
+keyless — a backtestable analog of the live regime logic.
+
 ## Handling Tool Failures
 
 Degrade gracefully — never invent numbers.

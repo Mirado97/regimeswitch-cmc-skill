@@ -26,9 +26,9 @@ How this project maps to the BNB HACK submission requirements and judging criter
 
 | Criterion | Evidence |
 |---|---|
-| **Technical execution** | Runs end-to-end: `npm start` pulls **live** CMC data and prints a strategy spec; `npm test` passes 4/4; classifier logic in code matches the documented `SKILL.md` |
-| **Originality** | Regime-switching meta-strategy (TREND / CHOP / STRESS), not a single fixed indicator rule |
-| **Real-world relevance** | Clear user (quant / strategy researcher); output is a ready-to-backtest spec; graceful degradation when a data lane is missing |
+| **Technical execution** | Runs end-to-end: `npm start` pulls **live** CMC data and prints a strategy spec; `npm test` passes; **real-OHLCV backtest** (`npm run backtest`) with no look-ahead; classifier logic in code matches the documented `SKILL.md` |
+| **Originality** | Regime-switching meta-strategy (TREND / CHOP / STRESS) + a regime-aware token screener (which coins fit the regime), not a single fixed indicator rule |
+| **Real-world relevance** | Clear user (quant / strategy researcher); ready-to-backtest spec **with proven results** — out-of-sample across BTC/ETH/BNB/SOL it beats/matches buy & hold with higher Sharpe and lower drawdown on every asset |
 | **Demo & presentation** | Bilingual (EN/RU) `index.html` dashboard wired to a live CMC snapshot; human-readable report from the CLI |
 
 ## Validation

@@ -8,6 +8,8 @@
     "start": "node run.js --live",
     "live": "node run.js --live",
     "fixture": "node run.js --fixture",
+    "backtest": "node backtest.js BTCUSDT",
+    "backtest:all": "node backtest.js all",
     "test": "node test.js"
   },
   "license": "MIT"
