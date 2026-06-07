@@ -2,6 +2,7 @@
 const fs = require("fs");
 const path = require("path");
 const { detectRegime } = require("./regime.js");
+const { screenTokens } = require("./screener.js");
 
 const cases = [
   {
@@ -27,12 +28,31 @@ const cases = [
 ];
 
 let failed = 0;
-for (const c of cases) {
-  const got = detectRegime(c.signals).key;
-  const ok = got === c.expect;
-  if (!ok) failed++;
-  console.log(`${ok ? "PASS" : "FAIL"}  ${c.name}  (expected ${c.expect}, got ${got})`);
+let total = 0;
+function check(name, cond) {
+  total++; if (!cond) failed++;
+  console.log(`${cond ? "PASS" : "FAIL"}  ${name}`);
 }
 
-console.log(`\n${cases.length - failed}/${cases.length} passed`);
+for (const c of cases) {
+  const got = detectRegime(c.signals).key;
+  check(`${c.name}  (expected ${c.expect}, got ${got})`, got === c.expect);
+}
+
+// --- screener tests (use the bundled real universe) ---
+const universe = JSON.parse(fs.readFileSync(path.join(__dirname, "universe.fixture.json"), "utf8"));
+
+const chop = screenTokens("chop", universe, { limit: 5 });
+check("screener: chop returns picks", chop.picks.length > 0);
+check("screener: chop top pick is the biggest 24h mover (ZEC)", chop.picks[0].symbol === "ZEC");
+check("screener: stablecoins filtered out", !chop.picks.some((p) => ["USDT", "USDC"].includes(p.symbol)));
+
+const trend = screenTokens("trend", universe, { limit: 3 });
+check("screener: trend returns picks", trend.picks.length === 3);
+
+const userList = screenTokens("chop", universe, { symbols: ["BTC", "ETH", "NOSUCH"] });
+check("screener: user list keeps only requested symbols", userList.picks.every((p) => ["BTC", "ETH"].includes(p.symbol)));
+check("screener: unknown symbol reported as not_found", userList.missing.includes("NOSUCH"));
+
+console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

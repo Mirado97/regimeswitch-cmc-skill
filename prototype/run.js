@@ -6,6 +6,7 @@
 const fs = require("fs");
 const path = require("path");
 const { detectRegime, buildCapsule } = require("./regime.js");
+const { fetchUniverse, screenTokens } = require("./screener.js");
 
 const CMC = "https://api.coinmarketcap.com/data-api/v3";
 
@@ -70,16 +71,38 @@ function humanReport(c) {
   c.strategy.entry_rules.forEach((r) => L.push(`    - [${r.side}] ${r.condition}${r.stop ? " (stop: " + r.stop + ")" : ""}`));
   L.push("  Exit rules:");
   c.strategy.exit_rules.forEach((r) => L.push(`    - ${r.condition} -> ${r.action}`));
+  if (c.candidates) {
+    L.push("");
+    L.push(`  Token candidates for ${c.regime} (from ${c.candidates.universe} screened):`);
+    c.candidates.picks.forEach((p) =>
+      L.push(`    - ${p.symbol.padEnd(6)} [${p.side}]  ${p.reason}`));
+    if (c.candidates.not_found.length) L.push(`    (not in universe: ${c.candidates.not_found.join(", ")})`);
+  }
   L.push("");
   return L.join("\n");
 }
 const fmt = (v, u = "") => (v == null ? "n/a" : v + (u ? " " + u : ""));
 
+function argVal(flag) {
+  const a = process.argv.find((x) => x.startsWith(flag + "="));
+  return a ? a.slice(flag.length + 1) : null;
+}
+
 async function main() {
   const live = process.argv.includes("--live");
+  const tokensArg = argVal("--tokens");
+  const symbols = tokensArg ? tokensArg.split(",").map((s) => s.trim()).filter(Boolean) : [];
+  const top = parseInt(argVal("--top") || "100", 10);
+
   const signals = live ? await liveSignals() : fixtureSignals();
   const det = detectRegime(signals);
   const capsule = buildCapsule(signals, det);
+
+  // token screener: which coins fit the detected regime
+  const universe = live ? await fetchUniverse(top)
+    : JSON.parse(fs.readFileSync(path.join(__dirname, "universe.fixture.json"), "utf8"));
+  const screen = screenTokens(det.key, universe, { symbols, limit: 5 });
+  capsule.candidates = { universe: universe.length, picks: screen.picks, not_found: screen.missing };
 
   console.log(humanReport(capsule));
   console.log("  Strategy Capsule (JSON):");

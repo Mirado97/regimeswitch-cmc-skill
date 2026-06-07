@@ -35,9 +35,11 @@ CMC market data  →  Regime detector  →  Regime-specific rules  →  Entry/ex
 │       └── SKILL.md        # the deliverable: the CMC skill itself
 ├── prototype/              # runnable reference implementation of the skill
 │   ├── regime.js           #   classifier + strategy rule book (matches SKILL.md)
+│   ├── screener.js         #   token screener — picks coins that fit the regime
 │   ├── run.js              #   CLI: --live (real CMC keyless API) or --fixture
-│   ├── fixture.json        #   real CMC snapshot (2026-06-07)
-│   └── test.js             #   regime classifier tests
+│   ├── fixture.json        #   real CMC market snapshot (2026-06-07)
+│   ├── universe.fixture.json #  real top-12 token snapshot (2026-06-07)
+│   └── test.js             #   classifier + screener tests
 ├── deliverables/
 │   └── judging_alignment.md
 ├── index.html              # demo dashboard (visualizes the skill output)
@@ -50,14 +52,22 @@ A dependency-free Node.js (>=18) reference implementation of the skill:
 
 ```bash
 cd prototype
-node run.js --live       # pulls LIVE data from CMC's keyless public API, prints a strategy spec
-node run.js --fixture    # uses a bundled real CMC snapshot (offline, deterministic)
-node test.js             # classifier tests (4/4)
+node run.js --live                      # LIVE CMC data -> regime + token candidates
+node run.js --live --tokens=BTC,ETH,SOL # screen only your token list
+node run.js --live --top=200            # auto-scan the top 200 by market cap
+node run.js --fixture                   # bundled real snapshot (offline, deterministic)
+node test.js                            # classifier + screener tests (10/10)
 ```
 
 `--live` fetches Fear & Greed and global metrics from CMC with no API key, classifies the regime,
-and emits the `Strategy Capsule` JSON. Derivatives are not exposed keyless, so the prototype
-degrades gracefully (caps confidence, never asserts STRESS on sentiment alone).
+and emits the `Strategy Capsule` JSON. It then screens tokens (your `--tokens` list, or the top
+`--top` by market cap) and ranks those that fit the regime's playbook. Derivatives are not exposed
+keyless, so the prototype degrades gracefully (caps confidence, never asserts STRESS on sentiment alone).
+
+### Two layers
+
+The **regime** is read from the whole market (the "weather"); the **rules + token screen** apply
+to specific coins. So the output is: *current regime → strategy rules → the tokens that fit it.*
 
 ## The skill
 

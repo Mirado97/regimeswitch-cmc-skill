@@ -18,6 +18,7 @@ allowed-tools:
   - mcp__cmc-mcp__get_global_crypto_derivatives_metrics
   - mcp__cmc-mcp__get_crypto_marketcap_technical_analysis
   - mcp__cmc-mcp__get_crypto_quotes_latest
+  - mcp__cmc-mcp__get_crypto_listings_latest
 ---
 
 # RegimeSwitch Strategy Skill
@@ -40,8 +41,10 @@ running; if data tools are unavailable, do not fabricate values — return a blo
 
 | Parameter   | Required | Default | Meaning                                                        |
 |-------------|----------|---------|----------------------------------------------------------------|
-| `asset`     | no       | `BTC`   | Symbol to build the strategy for.                              |
+| `asset`     | no       | `BTC`   | Anchor symbol for the rule set.                               |
 | `timeframe` | no       | `1d`    | Bar size the emitted rules assume (`1h`, `4h`, `1d`).          |
+| `tokens`    | no       | —       | Optional symbol list to screen (e.g. `BTC,ETH,SOL`). If omitted, the top `universe` tokens are auto-scanned. |
+| `universe`  | no       | `100`   | How many top tokens (by market cap) to screen for candidates. |
 
 ## Core Principle
 
@@ -62,6 +65,8 @@ Run these steps in order. Each pulls a specific CMC signal used by the classifie
    → read trend/momentum signal and a volatility proxy for the market.
 4. **Asset confirmation** — `get_crypto_quotes_latest` for `asset`
    → read 24h / 7d price change to confirm direction and momentum strength.
+5. **Token universe** — `get_crypto_listings_latest` (top `universe` by market cap)
+   → read per-token 24h / 7d change and volume, used by the screener below.
 
 ## Regime Classification
 
@@ -113,6 +118,20 @@ Emit **only** the block matching the detected regime.
 - **Exit:** cut losers immediately; no averaging down; exit on volatility spike.
 - **No fresh longs** until Fear&Greed recovers above 25 (regime-exit condition).
 
+## Token Screening
+
+The skill works in two layers: the **regime** is read from the *whole market* (the "weather"),
+then the rules apply to *specific tokens*. The screener picks which tokens fit the detected regime,
+from either the user's `tokens` list or the top `universe` by market cap. Stablecoins and illiquid
+names are filtered out. Screen signals are snapshot **proxies** (from % change / volume); true
+RSI/MACD belong to the per-token backtest.
+
+- **TREND** → rank by momentum (24h weighted over 7d); side = direction of the move.
+- **CHOP** → rank by the 24h extreme; oversold ⇒ long, overbought ⇒ short (mean-reversion).
+- **STRESS** → rank by calmness (smallest moves); side = avoid / hold (defensive).
+
+Output a ranked shortlist with, per token, the side and the reason it fits the regime.
+
 ## Output Format — backtestable strategy spec
 
 Return a single JSON object the user can hand to a backtester:
@@ -142,6 +161,13 @@ Return a single JSON object the user can hand to a backtester:
     ],
     "position_sizing": "0.5x baseline",
     "regime_exit": "Fear&Greed > 25"
+  },
+  "candidates": {
+    "universe": 100,
+    "picks": [
+      { "symbol": "SIREN", "side": "short (overbought)", "ch24h": 56.51, "reason": "24h +56.51% — overbought fade (RSI proxy)" }
+    ],
+    "not_found": []
   },
   "disclaimer": "Research spec for backtesting. Not financial advice, not live-execution."
 }

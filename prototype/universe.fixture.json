@@ -1,0 +1,14 @@
+[
+  {"symbol":"BTC","name":"Bitcoin","rank":1,"price":61791.68,"ch1h":-0.09,"ch24h":1.61,"ch7d":-16.32,"vol24h":30608526216,"mcap":1238248948152},
+  {"symbol":"ETH","name":"Ethereum","rank":2,"price":1618.78,"ch1h":0.29,"ch24h":3.78,"ch7d":-19.92,"vol24h":14582242325,"mcap":195361703243},
+  {"symbol":"USDT","name":"Tether USDt","rank":3,"price":1,"ch1h":-0.01,"ch24h":0.01,"ch7d":0.11,"vol24h":63118906634,"mcap":186885205155},
+  {"symbol":"BNB","name":"BNB","rank":4,"price":588.12,"ch1h":0.06,"ch24h":2.4,"ch7d":-19.49,"vol24h":1233750949,"mcap":79269828246},
+  {"symbol":"USDC","name":"USDC","rank":5,"price":1,"ch1h":0,"ch24h":0.01,"ch7d":0.02,"vol24h":9171925313,"mcap":75543077231},
+  {"symbol":"XRP","name":"XRP","rank":6,"price":1.12,"ch1h":-0.06,"ch24h":2.62,"ch7d":-16.54,"vol24h":1987705281,"mcap":69659916550},
+  {"symbol":"SOL","name":"Solana","rank":7,"price":64.29,"ch1h":0.42,"ch24h":3.14,"ch7d":-22.42,"vol24h":2726283594,"mcap":37246161751},
+  {"symbol":"TRX","name":"TRON","rank":8,"price":0.33,"ch1h":0.04,"ch24h":2.41,"ch7d":-5.98,"vol24h":508974720,"mcap":31079446367},
+  {"symbol":"HYPE","name":"Hyperliquid","rank":9,"price":57.67,"ch1h":-0.37,"ch24h":-1.9,"ch7d":-15.54,"vol24h":673054821,"mcap":14625118531},
+  {"symbol":"DOGE","name":"Dogecoin","rank":10,"price":0.08,"ch1h":0.16,"ch24h":2.45,"ch7d":-17.09,"vol24h":724471660,"mcap":14262284510},
+  {"symbol":"LEO","name":"UNUS SED LEO","rank":11,"price":9.52,"ch1h":0.08,"ch24h":-0.42,"ch7d":-4.68,"vol24h":1817077,"mcap":8761046814},
+  {"symbol":"ZEC","name":"Zcash","rank":12,"price":412.75,"ch1h":2.94,"ch24h":14.62,"ch7d":-25.71,"vol24h":1377547024,"mcap":6896104667}
+]
