@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,39 +25,38 @@
     display:flex;align-items:center;justify-content:center;font-weight:800;color:#0a0e17;font-size:20px}
   .brand h1{font-size:20px;letter-spacing:.3px}
   .brand p{font-size:12px;color:var(--muted);margin-top:2px}
+  .hgroup{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   .badge{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:7px 12px;border-radius:999px;white-space:nowrap}
   .badge b{color:var(--accent)}
+  .langtog{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .langtog button{background:transparent;color:var(--muted);border:none;padding:7px 14px;cursor:pointer;font-size:12px;font-weight:800;letter-spacing:.5px}
+  .langtog button.active{background:var(--accent);color:#0a0e17}
 
   .grid{display:grid;gap:16px}
-  .cols-3{grid-template-columns:repeat(3,1fr)}
   .cols-2{grid-template-columns:1.1fr .9fr}
-  @media(max-width:920px){.cols-3,.cols-2{grid-template-columns:1fr}}
+  @media(max-width:920px){.cols-2{grid-template-columns:1fr}}
 
   .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
   .card h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:14px;font-weight:600}
 
-  /* regime hero */
   .hero{position:relative;overflow:hidden}
   .hero .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
   .regime-name{font-size:40px;font-weight:800;margin:6px 0 4px;line-height:1}
-  .regime-desc{color:var(--muted);font-size:14px;max-width:520px}
+  .regime-desc{color:var(--muted);font-size:14px;max-width:560px}
   .conf{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:var(--muted)}
   .dot{width:9px;height:9px;border-radius:50%}
   .pill{display:inline-block;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;margin-top:14px}
 
-  /* metrics */
-  .metric{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line)}
+  .metric{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line);gap:12px}
   .metric:last-child{border-bottom:none}
   .metric .k{color:var(--muted);font-size:13px}
-  .metric .v{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+  .metric .v{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;text-align:right}
   .v.pos{color:var(--trend)} .v.neg{color:var(--stress)}
 
-  /* gauge */
   .gauge{height:10px;border-radius:999px;background:linear-gradient(90deg,#ef4444,#f0b90b,#22c55e);position:relative;margin:10px 0 6px}
   .gauge .ptr{position:absolute;top:-5px;width:4px;height:20px;border-radius:2px;background:#fff;box-shadow:0 0 0 2px #0a0e17}
   .gauge-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
 
-  /* regime tabs */
   .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
   .tab{flex:1;min-width:120px;cursor:pointer;border:1px solid var(--line);background:var(--panel2);
     border-radius:12px;padding:12px;text-align:center;transition:.15s;user-select:none}
@@ -67,7 +66,6 @@
   .tab.active{box-shadow:inset 0 0 0 1.5px currentColor}
   .tab.trend.active{color:var(--trend)} .tab.chop.active{color:var(--chop)} .tab.stress.active{color:var(--stress)}
 
-  /* rules */
   .rule{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.45}
   .rule:last-child{border-bottom:none}
   .rule .tag{flex-shrink:0;font-size:11px;font-weight:800;padding:3px 9px;border-radius:6px;height:fit-content;letter-spacing:.5px}
@@ -77,7 +75,6 @@
   .tag.risk{background:rgba(139,151,176,.15);color:var(--muted)}
   code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:12.5px;color:#cdd6ec}
 
-  /* signal */
   .signal{display:flex;align-items:center;gap:16px}
   .sig-badge{font-size:26px;font-weight:900;padding:12px 22px;border-radius:14px;letter-spacing:1px}
   .sig-long{background:rgba(34,197,94,.15);color:var(--long)}
@@ -100,15 +97,20 @@
       <div class="logo">R</div>
       <div>
         <h1>RegimeSwitch</h1>
-        <p>Adaptive CMC strategy skill — one meta-strategy, three market regimes</p>
+        <p data-i18n="brandSub"></p>
       </div>
     </div>
-    <div class="badge">BNB AI Hackathon · <b>Track 2: Strategy Skills</b></div>
+    <div class="hgroup">
+      <div class="langtog">
+        <button data-lang="en" class="active">EN</button>
+        <button data-lang="ru">RU</button>
+      </div>
+      <div class="badge" data-i18n-html="badge"></div>
+    </div>
   </header>
 
-  <!-- HERO: detected regime -->
   <div class="card hero" id="hero" style="margin-bottom:16px">
-    <div class="label">Live regime · auto-detected from CMC snapshot</div>
+    <div class="label" data-i18n="heroLabel"></div>
     <div class="regime-name" id="heroName">—</div>
     <div class="regime-desc" id="heroDesc"></div>
     <span class="pill" id="heroPill"></span>
@@ -116,174 +118,261 @@
   </div>
 
   <div class="grid cols-2" style="margin-bottom:16px">
-    <!-- inputs -->
     <div class="card">
-      <h2>CMC data inputs</h2>
+      <h2 data-i18n="inputs"></h2>
       <div style="margin-bottom:6px">
-        <div class="metric"><span class="k">Fear &amp; Greed Index</span><span class="v" id="mFg"></span></div>
+        <div class="metric"><span class="k" data-i18n="mFg"></span><span class="v" id="mFg"></span></div>
         <div class="gauge"><div class="ptr" id="fgPtr"></div></div>
-        <div class="gauge-lbl"><span>Extreme fear</span><span>Neutral</span><span>Extreme greed</span></div>
+        <div class="gauge-lbl"><span data-i18n="gLow"></span><span data-i18n="gMid"></span><span data-i18n="gHigh"></span></div>
       </div>
-      <div class="metric"><span class="k">Funding rate (7d avg)</span><span class="v" id="mFund"></span></div>
-      <div class="metric"><span class="k">Open interest 7d</span><span class="v" id="mOi"></span></div>
-      <div class="metric"><span class="k">Market cap 24h</span><span class="v" id="mMom"></span></div>
-      <div class="metric"><span class="k">Liquidation stress</span><span class="v" id="mVol"></span></div>
-      <div class="metric"><span class="k">BTC dominance</span><span class="v" id="mCorr"></span></div>
+      <div class="metric"><span class="k" data-i18n="mFund"></span><span class="v" id="mFund"></span></div>
+      <div class="metric"><span class="k" data-i18n="mOi"></span><span class="v" id="mOi"></span></div>
+      <div class="metric"><span class="k" data-i18n="mMom"></span><span class="v" id="mMom"></span></div>
+      <div class="metric"><span class="k" data-i18n="mVol"></span><span class="v" id="mVol"></span></div>
+      <div class="metric"><span class="k" data-i18n="mCorr"></span><span class="v" id="mCorr"></span></div>
     </div>
 
-    <!-- signal -->
     <div class="card">
-      <h2>Strategy output · current signal</h2>
+      <h2 data-i18n="output"></h2>
       <div class="signal" style="margin-bottom:18px">
         <div class="sig-badge" id="sigBadge">—</div>
         <div class="sig-note" id="sigNote"></div>
       </div>
-      <h2>Active strategy</h2>
+      <h2 data-i18n="activeH"></h2>
       <div id="activeName" style="font-weight:800;font-size:17px;margin-bottom:4px"></div>
       <div class="sig-note" id="activeSub"></div>
     </div>
   </div>
 
-  <!-- rule explorer -->
   <div class="card">
-    <h2>Regime rule book — click a regime to inspect its logic</h2>
+    <h2 data-i18n="rulebook"></h2>
     <div class="tabs">
-      <div class="tab trend"  data-r="trend"><div class="t-name" style="color:var(--trend)">TREND</div><div class="t-sub">follow momentum</div></div>
-      <div class="tab chop"   data-r="chop"><div class="t-name" style="color:var(--chop)">CHOP</div><div class="t-sub">mean-reversion</div></div>
-      <div class="tab stress" data-r="stress"><div class="t-name" style="color:var(--stress)">STRESS</div><div class="t-sub">capital preservation</div></div>
+      <div class="tab trend"  data-r="trend"><div class="t-name" style="color:var(--trend)">TREND</div><div class="t-sub" data-i18n="tabTrend"></div></div>
+      <div class="tab chop"   data-r="chop"><div class="t-name" style="color:var(--chop)">CHOP</div><div class="t-sub" data-i18n="tabChop"></div></div>
+      <div class="tab stress" data-r="stress"><div class="t-name" style="color:var(--stress)">STRESS</div><div class="t-sub" data-i18n="tabStress"></div></div>
     </div>
     <div id="rules"></div>
     <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)">
-      <b style="color:var(--txt)">Regime trigger:</b> <span id="trigger"></span>
+      <b style="color:var(--txt)" data-i18n="triggerLabel"></b> <span id="trigger"></span>
     </div>
   </div>
 
   <footer>
-    <div>Powered by <b>CoinMarketCap</b> Agent Hub · live snapshot 2026-06-07, cross-checked vs <code>detect_market_regime</code> · output: backtestable strategy spec</div>
+    <div data-i18n-html="footer1"></div>
     <div class="flow">
-      <span>CMC market data</span><span class="arr">→</span>
-      <span>Regime detector</span><span class="arr">→</span>
-      <span>Regime-specific rules</span><span class="arr">→</span>
-      <span>Entry / exit signal</span>
+      <span data-i18n="flow1"></span><span class="arr">→</span>
+      <span data-i18n="flow2"></span><span class="arr">→</span>
+      <span data-i18n="flow3"></span><span class="arr">→</span>
+      <span data-i18n="flow4"></span>
     </div>
   </footer>
 
 </div>
 
 <script>
-  // --- CMC snapshot (mock shaped on real daily_market_overview output) ---
-  // live CMC snapshot — detect_market_regime, 2026-06-07, 7d window
-  const cmc = {
-    fearGreed: 14,          // extreme fear
-    funding: 0.42,          // % avg perp funding 7d (41.57 bps)
-    oiChange: -15.82,       // % open interest 7d
-    momentum: 1.38,         // % market cap 24h
-    liqStress: 0.24,        // liquidation stress ratio 0..1 (contained)
-    dominance: 58.13        // BTC dominance %
+  // ---------- i18n dictionary ----------
+  const T = {
+    en:{
+      brandSub:"Adaptive CMC strategy skill — one meta-strategy, three market regimes",
+      badge:"BNB AI Hackathon · <b>Track 2: Strategy Skills</b>",
+      heroLabel:"Live regime · auto-detected from CMC snapshot",
+      stratPrefix:"Strategy: ", confLabel:"Detection confidence: ",
+      inputs:"CMC data inputs", output:"Strategy output · current signal",
+      activeH:"Active strategy", rulebook:"Regime rule book — click a regime to inspect its logic",
+      triggerLabel:"Regime trigger:",
+      mFg:"Fear & Greed Index", mFund:"Funding rate (7d avg)", mOi:"Open interest 7d",
+      mMom:"Market cap 24h", mVol:"Liquidation stress", mCorr:"BTC dominance",
+      gLow:"Extreme fear", gMid:"Neutral", gHigh:"Extreme greed",
+      tabTrend:"follow momentum", tabChop:"mean-reversion", tabStress:"capital preservation",
+      footer1:"Powered by <b>CoinMarketCap</b> Agent Hub · live snapshot 2026-06-07, cross-checked vs <code>detect_market_regime</code> · output: backtestable strategy spec",
+      flow1:"CMC market data", flow2:"Regime detector", flow3:"Regime-specific rules", flow4:"Entry / exit signal",
+      fearLbl:{low:"Extreme fear",mid:"Neutral",high:"Extreme greed"},
+      contained:"contained", conf:{high:"high",medium:"medium",low:"low"}
+    },
+    ru:{
+      brandSub:"Адаптивный навык-стратегия на данных CMC — одна метастратегия, три рыночных режима",
+      badge:"BNB AI Hackathon · <b>Трек 2: Strategy Skills</b>",
+      heroLabel:"Живой режим · авто-определён по снимку CMC",
+      stratPrefix:"Стратегия: ", confLabel:"Уверенность определения: ",
+      inputs:"Входные данные CMC", output:"Выход стратегии · текущий сигнал",
+      activeH:"Активная стратегия", rulebook:"Свод правил по режимам — кликни режим, чтобы увидеть логику",
+      triggerLabel:"Триггер режима:",
+      mFg:"Индекс страха и жадности", mFund:"Фандинг (ср. 7д)", mOi:"Открытый интерес 7д",
+      mMom:"Капитализация 24ч", mVol:"Ликвидационный стресс", mCorr:"Доминация BTC",
+      gLow:"Крайний страх", gMid:"Нейтрально", gHigh:"Крайняя жадность",
+      tabTrend:"следование тренду", tabChop:"возврат к среднему", tabStress:"сохранение капитала",
+      footer1:"На данных <b>CoinMarketCap</b> Agent Hub · живой снимок 2026-06-07, сверено с <code>detect_market_regime</code> · выход: backtestable strategy spec",
+      flow1:"Данные рынка CMC", flow2:"Детектор режима", flow3:"Правила под режим", flow4:"Сигнал входа/выхода",
+      fearLbl:{low:"Крайний страх",mid:"Нейтрально",high:"Крайняя жадность"},
+      contained:"сдержан", conf:{high:"высокая",medium:"средняя",low:"низкая"}
+    }
   };
 
-  // --- regime definitions ---
+  // ---------- live CMC snapshot (detect_market_regime, 2026-06-07, 7d) ----------
+  const cmc = {
+    fearGreed: 14, funding: 0.42, oiChange: -15.82,
+    momentum: 1.38, liqStress: 0.24, dominance: 58.13
+  };
+
+  // ---------- bilingual regime rule book ----------
   const REGIMES = {
     trend:{
-      name:"TREND EXPANSION", color:"var(--trend)",
-      desc:"Directional move with aligned positioning. Ride the trend, cut against it fast.",
-      active:"Momentum follow",
-      activeSub:"Trade in the direction of the move; pyramiding allowed, trailing stop.",
-      trigger:"|momentum| ≥ 2% AND OI rising AND 25 ≤ F&G ≤ 75",
+      color:"var(--trend)",
+      name:{en:"TREND EXPANSION",ru:"ТРЕНД"},
+      desc:{en:"Directional move with aligned positioning. Ride the trend, cut against it fast.",
+            ru:"Направленное движение с подтверждённым позиционированием. Идём по тренду, против — режем быстро."},
+      active:{en:"Momentum follow",ru:"Следование за трендом"},
+      activeSub:{en:"Trade in the direction of the move; pyramiding allowed, trailing stop.",
+                 ru:"Торгуем по направлению движения; доливка разрешена, трейлинг-стоп."},
+      trigger:{en:"|momentum| ≥ 2% AND OI rising AND 25 ≤ F&G ≤ 75",
+               ru:"|моментум| ≥ 2% И OI растёт И 25 ≤ F&G ≤ 75"},
       rules:[
-        {tag:"long", t:"Enter <b>LONG</b> when price &gt; <code>EMA50</code> and <code>MACD</code> histogram turns positive while F&amp;G is 40–70."},
-        {tag:"short",t:"Enter <b>SHORT</b> in a confirmed downtrend (price &lt; <code>EMA50</code>, MACD bearish)."},
-        {tag:"exit", t:"Exit on opposite <code>MACD</code> cross or trailing stop hit (e.g. 1.5×ATR)."},
-        {tag:"risk", t:"Size up vs other regimes; one position per asset; no counter-trend entries."}
+        {tag:"long", t:{en:"Enter <b>LONG</b> when price &gt; <code>EMA50</code> and <code>MACD</code> histogram turns positive while F&amp;G is 40–70.",
+                        ru:"Вход <b>LONG</b>: цена &gt; <code>EMA50</code> и гистограмма <code>MACD</code> разворачивается вверх при F&amp;G 40–70."}},
+        {tag:"short",t:{en:"Enter <b>SHORT</b> in a confirmed downtrend (price &lt; <code>EMA50</code>, MACD bearish).",
+                        ru:"Вход <b>SHORT</b> в подтверждённом нисходящем тренде (цена &lt; <code>EMA50</code>, MACD вниз)."}},
+        {tag:"exit", t:{en:"Exit on opposite <code>MACD</code> cross or trailing stop hit (e.g. 1.5×ATR).",
+                        ru:"Выход по обратному пересечению <code>MACD</code> или трейлинг-стопу (напр. 1.5×ATR)."}},
+        {tag:"risk", t:{en:"Size up vs other regimes; one position per asset; no counter-trend entries.",
+                        ru:"Размер больше, чем в других режимах; одна позиция на актив; без контртрендовых входов."}}
       ]
     },
     chop:{
-      name:"RANGE CHOP", color:"var(--chop)",
-      desc:"Low-conviction, range-bound tape. Fade extremes, take profit at the middle.",
-      active:"Mean-reversion",
-      activeSub:"Buy the range low, sell the range high; no trend chasing.",
-      trigger:"low volatility AND neutral F&G AND OI flat",
+      color:"var(--chop)",
+      name:{en:"RANGE CHOP",ru:"ФЛЭТ / ПЕРЕХОД"},
+      desc:{en:"Low-conviction, range-bound tape. Fade extremes, take profit at the middle.",
+            ru:"Низкая убеждённость, рынок в диапазоне. Гасим крайности, фиксируем в середине."},
+      active:{en:"Mean-reversion",ru:"Возврат к среднему"},
+      activeSub:{en:"Buy the range low, sell the range high; no trend chasing.",
+                 ru:"Покупаем у низа диапазона, продаём у верха; за трендом не гонимся."},
+      trigger:{en:"low volatility AND neutral F&G AND OI flat",
+               ru:"низкая волатильность И нейтральный F&G И OI без движения"},
       rules:[
-        {tag:"long", t:"Enter <b>LONG</b> at range support when <code>RSI &lt; 30</code> (oversold)."},
-        {tag:"short",t:"Enter <b>SHORT</b> at range resistance when <code>RSI &gt; 70</code> (overbought)."},
-        {tag:"exit", t:"Take profit at range midpoint (<code>VWAP</code> / mid-Bollinger); tight stop beyond the band."},
-        {tag:"risk", t:"Smaller size, quick turnover; stand aside if a breakout confirms (regime change)."}
+        {tag:"long", t:{en:"Enter <b>LONG</b> at range support when <code>RSI &lt; 30</code> (oversold).",
+                        ru:"Вход <b>LONG</b> у поддержки диапазона при <code>RSI &lt; 30</code> (перепроданность)."}},
+        {tag:"short",t:{en:"Enter <b>SHORT</b> at range resistance when <code>RSI &gt; 70</code> (overbought).",
+                        ru:"Вход <b>SHORT</b> у сопротивления при <code>RSI &gt; 70</code> (перекупленность)."}},
+        {tag:"exit", t:{en:"Take profit at range midpoint (<code>VWAP</code> / mid-Bollinger); tight stop beyond the band.",
+                        ru:"Фиксация у середины диапазона (<code>VWAP</code> / средняя Боллинджера); тесный стоп за полосой."}},
+        {tag:"risk", t:{en:"Smaller size, quick turnover; stand aside if a breakout confirms (regime change).",
+                        ru:"Меньший размер, быстрый оборот; в стороне, если подтверждается пробой (смена режима)."}}
       ]
     },
     stress:{
-      name:"LIQUIDATION STRESS", color:"var(--stress)",
-      desc:"Risk-off / deleveraging. Preserve capital first — most of the time stay flat.",
-      active:"Capital preservation",
-      activeSub:"Default flat. Only opportunistic shorts on breakdowns, reduced size.",
-      trigger:"F&G &lt; 25 OR volatility &gt; 30 OR funding extreme",
+      color:"var(--stress)",
+      name:{en:"LIQUIDATION STRESS",ru:"ЛИКВИДАЦИОННЫЙ СТРЕСС"},
+      desc:{en:"Risk-off / deleveraging. Preserve capital first — most of the time stay flat.",
+            ru:"Risk-off / делеверидж. Сначала сохранить капитал — большую часть времени вне рынка."},
+      active:{en:"Capital preservation",ru:"Сохранение капитала"},
+      activeSub:{en:"Default flat. Only opportunistic shorts on breakdowns, reduced size.",
+                 ru:"По умолчанию вне рынка. Только точечные шорты на пробоях, уменьшенный размер."},
+      trigger:{en:"F&G &lt; 25 AND (liquidations firing OR volatility spike)",
+               ru:"F&G &lt; 25 И (идут ликвидации ИЛИ всплеск волатильности)"},
       rules:[
-        {tag:"risk", t:"Default <b>FLAT</b> / move to cash; halve position sizing vs normal."},
-        {tag:"short",t:"Only <b>SHORT</b> on confirmed breakdown of key support, tight stop."},
-        {tag:"exit", t:"Cut losers immediately; no averaging down; exit on volatility spike."},
-        {tag:"long", t:"No fresh longs until F&amp;G recovers above 25 (regime exit condition)."}
+        {tag:"risk", t:{en:"Default <b>FLAT</b> / move to cash; halve normal position sizing.",
+                        ru:"По умолчанию <b>FLAT</b> / в кэш; размер позиции вдвое меньше."}},
+        {tag:"short",t:{en:"Only <b>SHORT</b> on confirmed breakdown of key support, tight stop.",
+                        ru:"Только <b>SHORT</b> на подтверждённом пробое ключевой поддержки, тесный стоп."}},
+        {tag:"exit", t:{en:"Cut losers immediately; no averaging down; exit on volatility spike.",
+                        ru:"Убыточные режем сразу; без усреднения; выход на всплеске волатильности."}},
+        {tag:"long", t:{en:"No fresh longs until F&amp;G recovers above 25 (regime exit condition).",
+                        ru:"Никаких новых лонгов, пока F&amp;G не вернётся выше 25 (условие выхода из режима)."}}
       ]
     }
   };
 
-  // --- regime detector (transparent, matches the rule book) ---
+  // ---------- regime detection (transparent, matches rule book) ----------
   function detectRegime(d){
     const stressConfirm = d.liqStress > 0.5 || (d.volatility||0) > 30;
-    if(d.fearGreed < 25 && stressConfirm)                 // fear must be confirmed by liquidations/vol
-      return {key:"stress", conf:"high"};
+    if(d.fearGreed < 25 && stressConfirm) return {key:"stress", conf:"high"};
     if(Math.abs(d.momentum) >= 2 && d.oiChange > 0 && d.fearGreed>=25 && d.fearGreed<=75)
       return {key:"trend", conf:"medium"};
-    return {key:"chop", conf:"low"};                       // incl. mixed / transition
+    return {key:"chop", conf:"low"};
   }
 
-  // --- signal for detected regime ---
   function signalFor(key,d){
-    if(key==="stress") return {cls:"sig-flat", txt:"FLAT", note:"Risk-off — capital preservation. Await F&G recovery above 25."};
+    const N = {
+      stress:{en:"Risk-off — capital preservation. Await F&G recovery above 25.",
+              ru:"Risk-off — сохранение капитала. Ждём возврата F&G выше 25."},
+      trendUp:{en:"Uptrend confirmed — follow momentum with trailing stop.",
+               ru:"Восходящий тренд подтверждён — идём по моментуму с трейлинг-стопом."},
+      trendDn:{en:"Downtrend confirmed — follow momentum with trailing stop.",
+               ru:"Нисходящий тренд подтверждён — идём по моментуму с трейлинг-стопом."},
+      chop:{en:"Mixed / transition — stay selective, reduce size, wait for a clear signal.",
+            ru:"Смешанный / переход — действуем избирательно, уменьшаем размер, ждём чёткого сигнала."}
+    };
+    if(key==="stress") return {cls:"sig-flat", txt:"FLAT", note:N.stress};
     if(key==="trend")  return d.momentum>=0
-      ? {cls:"sig-long", txt:"LONG", note:"Uptrend confirmed — follow momentum with trailing stop."}
-      : {cls:"sig-short",txt:"SHORT",note:"Downtrend confirmed — follow momentum with trailing stop."};
-    return {cls:"sig-flat", txt:"WAIT", note:"Mixed / transition — stay selective, reduce size, wait for a clear signal."};
+      ? {cls:"sig-long", txt:"LONG", note:N.trendUp}
+      : {cls:"sig-short",txt:"SHORT",note:N.trendDn};
+    return {cls:"sig-flat", txt:"WAIT", note:N.chop};
   }
 
-  // --- render inputs ---
-  const fmtPct = v => (v>0?"+":"")+v.toFixed(2)+"%";
-  document.getElementById("mFg").textContent   = cmc.fearGreed+" · "+(cmc.fearGreed<25?"Extreme fear":cmc.fearGreed>75?"Extreme greed":"Neutral");
-  document.getElementById("fgPtr").style.left  = cmc.fearGreed+"%";
-  const fund=document.getElementById("mFund"); fund.textContent=fmtPct(cmc.funding); fund.className="v "+(cmc.funding>=0?"pos":"neg");
-  const oi=document.getElementById("mOi"); oi.textContent=fmtPct(cmc.oiChange); oi.className="v "+(cmc.oiChange>=0?"pos":"neg");
-  const mom=document.getElementById("mMom"); mom.textContent=fmtPct(cmc.momentum); mom.className="v "+(cmc.momentum>=0?"pos":"neg");
-  document.getElementById("mVol").textContent  = cmc.liqStress.toFixed(2)+" · contained";
-  document.getElementById("mCorr").textContent = cmc.dominance.toFixed(2)+"%";
-
-  // --- apply detection ---
+  // ---------- render ----------
+  let lang = "en";
+  let activeTab;
   const det = detectRegime(cmc);
-  const R = REGIMES[det.key];
-  document.getElementById("heroName").textContent = R.name;
-  document.getElementById("heroName").style.color = R.color;
-  document.getElementById("heroDesc").textContent = R.desc;
-  const pill=document.getElementById("heroPill");
-  pill.textContent="Strategy: "+R.active;
-  pill.style.background="color-mix(in srgb,"+R.color+" 16%, transparent)";
-  pill.style.color=R.color;
-  document.getElementById("heroDot").style.background=R.color;
-  document.getElementById("heroConf").textContent="Detection confidence: "+det.conf;
+  const fmtPct = v => (v>0?"+":"")+v.toFixed(2)+"%";
 
-  const sig=signalFor(det.key,cmc);
-  const sb=document.getElementById("sigBadge"); sb.textContent=sig.txt; sb.className="sig-badge "+sig.cls;
-  document.getElementById("sigNote").textContent=sig.note;
-  document.getElementById("activeName").textContent=R.active;
-  document.getElementById("activeSub").textContent=R.activeSub;
+  function render(){
+    const t = T[lang];
 
-  // --- rule explorer tabs ---
+    // static strings
+    document.querySelectorAll("[data-i18n]").forEach(el=> el.textContent = t[el.dataset.i18n]);
+    document.querySelectorAll("[data-i18n-html]").forEach(el=> el.innerHTML = t[el.dataset.i18nHtml]);
+
+    // metrics
+    const fgLbl = cmc.fearGreed<25 ? t.fearLbl.low : cmc.fearGreed>75 ? t.fearLbl.high : t.fearLbl.mid;
+    document.getElementById("mFg").textContent  = cmc.fearGreed+" · "+fgLbl;
+    document.getElementById("fgPtr").style.left = cmc.fearGreed+"%";
+    const fund=document.getElementById("mFund"); fund.textContent=fmtPct(cmc.funding); fund.className="v "+(cmc.funding>=0?"pos":"neg");
+    const oi=document.getElementById("mOi"); oi.textContent=fmtPct(cmc.oiChange); oi.className="v "+(cmc.oiChange>=0?"pos":"neg");
+    const mom=document.getElementById("mMom"); mom.textContent=fmtPct(cmc.momentum); mom.className="v "+(cmc.momentum>=0?"pos":"neg");
+    document.getElementById("mVol").textContent  = cmc.liqStress.toFixed(2)+" · "+t.contained;
+    document.getElementById("mCorr").textContent = cmc.dominance.toFixed(2)+"%";
+
+    // hero
+    const R = REGIMES[det.key];
+    const hn=document.getElementById("heroName"); hn.textContent=R.name[lang]; hn.style.color=R.color;
+    document.getElementById("heroDesc").textContent = R.desc[lang];
+    const pill=document.getElementById("heroPill");
+    pill.textContent=t.stratPrefix+R.active[lang];
+    pill.style.background="color-mix(in srgb,"+R.color+" 16%, transparent)";
+    pill.style.color=R.color;
+    document.getElementById("heroDot").style.background=R.color;
+    document.getElementById("heroConf").textContent=t.confLabel+t.conf[det.conf];
+
+    // signal + active strategy
+    const sig=signalFor(det.key,cmc);
+    const sb=document.getElementById("sigBadge"); sb.textContent=sig.txt; sb.className="sig-badge "+sig.cls;
+    document.getElementById("sigNote").textContent=sig.note[lang];
+    document.getElementById("activeName").textContent=R.active[lang];
+    document.getElementById("activeSub").textContent=R.activeSub[lang];
+
+    // rule book (current tab)
+    showRules(activeTab || det.key);
+  }
+
   const tabs=document.querySelectorAll(".tab");
   function showRules(key){
-    tabs.forEach(t=>t.classList.toggle("active",t.dataset.r===key));
+    activeTab=key;
+    tabs.forEach(x=>x.classList.toggle("active",x.dataset.r===key));
     const r=REGIMES[key];
     document.getElementById("rules").innerHTML = r.rules.map(x=>
-      `<div class="rule"><span class="tag ${x.tag}">${x.tag.toUpperCase()}</span><span>${x.t}</span></div>`).join("");
-    document.getElementById("trigger").innerHTML = r.trigger;
+      `<div class="rule"><span class="tag ${x.tag}">${x.tag.toUpperCase()}</span><span>${x.t[lang]}</span></div>`).join("");
+    document.getElementById("trigger").innerHTML = r.trigger[lang];
   }
   tabs.forEach(t=>t.addEventListener("click",()=>showRules(t.dataset.r)));
-  showRules(det.key); // open on the detected regime
+
+  // language toggle
+  document.querySelectorAll(".langtog button").forEach(b=>b.addEventListener("click",()=>{
+    lang=b.dataset.lang;
+    document.documentElement.lang=lang;
+    document.querySelectorAll(".langtog button").forEach(x=>x.classList.toggle("active",x===b));
+    render();
+  }));
+
+  render();
 </script>
 </body>
 </html>
