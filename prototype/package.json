@@ -1,0 +1,14 @@
+{
+  "name": "regimeswitch-cmc-skill",
+  "version": "1.0.0",
+  "description": "Adaptive CMC strategy skill — market regime classification into a backtestable strategy spec",
+  "type": "commonjs",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node run.js --live",
+    "live": "node run.js --live",
+    "fixture": "node run.js --fixture",
+    "test": "node test.js"
+  },
+  "license": "MIT"
+}

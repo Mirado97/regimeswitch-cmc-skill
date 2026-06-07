@@ -1,0 +1,13 @@
+{
+  "asset": "BTC",
+  "timeframe": "1d",
+  "source": "CMC detect_market_regime fixture (2026-06-07, 7d window)",
+  "fearGreed": 14,
+  "momentum": 1.38,
+  "oiChange": -15.82,
+  "funding": 41.57,
+  "liqStress": 0.24,
+  "volatility": null,
+  "dominance": 58.13,
+  "derivativesAvailable": true
+}

@@ -70,10 +70,10 @@ Apply in this priority order (first match wins):
 ```
 STRESS  if  Fear&Greed < 25
         AND ( liquidation_stress_ratio > 0.5            # liquidations actually firing
-              OR volatility_proxy > 30
-              OR open_interest dropping sharply WITH rising funding )   # forced deleveraging
+              OR volatility_proxy > 30 )
         # Extreme fear ALONE is not stress. It must be confirmed by liquidations or
-        # volatility — otherwise the tape is a fearful range, not a cascade.
+        # volatility — otherwise the tape is a fearful range, not a cascade. A sharp OI
+        # drop with rising funding is a *watch* signal, not a STRESS trigger on its own.
 
 TREND   if  |asset_momentum_24h| >= 2%
         AND open_interest rising (positioning confirms)

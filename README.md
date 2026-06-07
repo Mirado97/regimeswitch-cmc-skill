@@ -33,9 +33,31 @@ CMC market data  →  Regime detector  →  Regime-specific rules  →  Entry/ex
 ├── skills/
 │   └── regime-switch-strategy/
 │       └── SKILL.md        # the deliverable: the CMC skill itself
+├── prototype/              # runnable reference implementation of the skill
+│   ├── regime.js           #   classifier + strategy rule book (matches SKILL.md)
+│   ├── run.js              #   CLI: --live (real CMC keyless API) or --fixture
+│   ├── fixture.json        #   real CMC snapshot (2026-06-07)
+│   └── test.js             #   regime classifier tests
+├── deliverables/
+│   └── judging_alignment.md
 ├── index.html              # demo dashboard (visualizes the skill output)
 └── README.md
 ```
+
+## Runnable prototype
+
+A dependency-free Node.js (>=18) reference implementation of the skill:
+
+```bash
+cd prototype
+node run.js --live       # pulls LIVE data from CMC's keyless public API, prints a strategy spec
+node run.js --fixture    # uses a bundled real CMC snapshot (offline, deterministic)
+node test.js             # classifier tests (4/4)
+```
+
+`--live` fetches Fear & Greed and global metrics from CMC with no API key, classifies the regime,
+and emits the `Strategy Capsule` JSON. Derivatives are not exposed keyless, so the prototype
+degrades gracefully (caps confidence, never asserts STRESS on sentiment alone).
 
 ## The skill
 
