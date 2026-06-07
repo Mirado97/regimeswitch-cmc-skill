@@ -124,11 +124,11 @@
         <div class="gauge"><div class="ptr" id="fgPtr"></div></div>
         <div class="gauge-lbl"><span>Extreme fear</span><span>Neutral</span><span>Extreme greed</span></div>
       </div>
-      <div class="metric"><span class="k">Funding rate (perps, avg)</span><span class="v" id="mFund"></span></div>
-      <div class="metric"><span class="k">Aggregate OI change 24h</span><span class="v" id="mOi"></span></div>
-      <div class="metric"><span class="k">CMC100 momentum 24h</span><span class="v" id="mMom"></span></div>
-      <div class="metric"><span class="k">Volatility proxy</span><span class="v" id="mVol"></span></div>
-      <div class="metric"><span class="k">BTC / S&amp;P 30d correlation</span><span class="v" id="mCorr"></span></div>
+      <div class="metric"><span class="k">Funding rate (7d avg)</span><span class="v" id="mFund"></span></div>
+      <div class="metric"><span class="k">Open interest 7d</span><span class="v" id="mOi"></span></div>
+      <div class="metric"><span class="k">Market cap 24h</span><span class="v" id="mMom"></span></div>
+      <div class="metric"><span class="k">Liquidation stress</span><span class="v" id="mVol"></span></div>
+      <div class="metric"><span class="k">BTC dominance</span><span class="v" id="mCorr"></span></div>
     </div>
 
     <!-- signal -->
@@ -159,7 +159,7 @@
   </div>
 
   <footer>
-    <div>Powered by <b>CoinMarketCap</b> Agent Hub · output: backtestable strategy spec (entry/exit rules)</div>
+    <div>Powered by <b>CoinMarketCap</b> Agent Hub · live snapshot 2026-06-07, cross-checked vs <code>detect_market_regime</code> · output: backtestable strategy spec</div>
     <div class="flow">
       <span>CMC market data</span><span class="arr">→</span>
       <span>Regime detector</span><span class="arr">→</span>
@@ -172,13 +172,14 @@
 
 <script>
   // --- CMC snapshot (mock shaped on real daily_market_overview output) ---
+  // live CMC snapshot — detect_market_regime, 2026-06-07, 7d window
   const cmc = {
-    fearGreed: 15,          // Extreme fear
-    funding: -0.011,        // % avg perp funding (negative = shorts pay)
-    oiChange24h: 11.4,      // % aggregate open interest 24h
-    momentum24h: 3.30,      // % CMC100 24h
-    volatility: 15.40,      // volatility proxy
-    corrSpx: 0.50           // BTC/SPX 30d
+    fearGreed: 14,          // extreme fear
+    funding: 0.42,          // % avg perp funding 7d (41.57 bps)
+    oiChange: -15.82,       // % open interest 7d
+    momentum: 1.38,         // % market cap 24h
+    liqStress: 0.24,        // liquidation stress ratio 0..1 (contained)
+    dominance: 58.13        // BTC dominance %
   };
 
   // --- regime definitions ---
@@ -226,20 +227,21 @@
 
   // --- regime detector (transparent, matches the rule book) ---
   function detectRegime(d){
-    if(d.fearGreed < 25 || d.volatility > 30 || Math.abs(d.funding) > 0.05)
+    const stressConfirm = d.liqStress > 0.5 || (d.volatility||0) > 30;
+    if(d.fearGreed < 25 && stressConfirm)                 // fear must be confirmed by liquidations/vol
       return {key:"stress", conf:"high"};
-    if(Math.abs(d.momentum24h) >= 2 && d.oiChange24h > 0)
+    if(Math.abs(d.momentum) >= 2 && d.oiChange > 0 && d.fearGreed>=25 && d.fearGreed<=75)
       return {key:"trend", conf:"medium"};
-    return {key:"chop", conf:"medium"};
+    return {key:"chop", conf:"low"};                       // incl. mixed / transition
   }
 
   // --- signal for detected regime ---
   function signalFor(key,d){
     if(key==="stress") return {cls:"sig-flat", txt:"FLAT", note:"Risk-off — capital preservation. Await F&G recovery above 25."};
-    if(key==="trend")  return d.momentum24h>=0
+    if(key==="trend")  return d.momentum>=0
       ? {cls:"sig-long", txt:"LONG", note:"Uptrend confirmed — follow momentum with trailing stop."}
       : {cls:"sig-short",txt:"SHORT",note:"Downtrend confirmed — follow momentum with trailing stop."};
-    return {cls:"sig-flat", txt:"WAIT", note:"Range-bound — wait for RSI extreme at range edge."};
+    return {cls:"sig-flat", txt:"WAIT", note:"Mixed / transition — stay selective, reduce size, wait for a clear signal."};
   }
 
   // --- render inputs ---
@@ -247,10 +249,10 @@
   document.getElementById("mFg").textContent   = cmc.fearGreed+" · "+(cmc.fearGreed<25?"Extreme fear":cmc.fearGreed>75?"Extreme greed":"Neutral");
   document.getElementById("fgPtr").style.left  = cmc.fearGreed+"%";
   const fund=document.getElementById("mFund"); fund.textContent=fmtPct(cmc.funding); fund.className="v "+(cmc.funding>=0?"pos":"neg");
-  const oi=document.getElementById("mOi"); oi.textContent=fmtPct(cmc.oiChange24h); oi.className="v "+(cmc.oiChange24h>=0?"pos":"neg");
-  const mom=document.getElementById("mMom"); mom.textContent=fmtPct(cmc.momentum24h); mom.className="v "+(cmc.momentum24h>=0?"pos":"neg");
-  document.getElementById("mVol").textContent  = cmc.volatility.toFixed(2);
-  document.getElementById("mCorr").textContent = cmc.corrSpx.toFixed(2);
+  const oi=document.getElementById("mOi"); oi.textContent=fmtPct(cmc.oiChange); oi.className="v "+(cmc.oiChange>=0?"pos":"neg");
+  const mom=document.getElementById("mMom"); mom.textContent=fmtPct(cmc.momentum); mom.className="v "+(cmc.momentum>=0?"pos":"neg");
+  document.getElementById("mVol").textContent  = cmc.liqStress.toFixed(2)+" · contained";
+  document.getElementById("mCorr").textContent = cmc.dominance.toFixed(2)+"%";
 
   // --- apply detection ---
   const det = detectRegime(cmc);

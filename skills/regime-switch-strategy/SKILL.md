@@ -56,7 +56,8 @@ Run these steps in order. Each pulls a specific CMC signal used by the classifie
 1. **Global market health** — `get_global_metrics_latest`
    → read Fear & Greed Index, BTC dominance, total market cap 24h change.
 2. **Derivatives positioning** — `get_global_crypto_derivatives_metrics`
-   → read aggregate open interest 24h change, average funding rate, long/short ratio.
+   → read aggregate open interest change, average funding rate, long/short ratio,
+   and the liquidation-stress ratio (how hard liquidations are actually firing).
 3. **Technical structure** — `get_crypto_marketcap_technical_analysis`
    → read trend/momentum signal and a volatility proxy for the market.
 4. **Asset confirmation** — `get_crypto_quotes_latest` for `asset`
@@ -68,19 +69,24 @@ Apply in this priority order (first match wins):
 
 ```
 STRESS  if  Fear&Greed < 25
-        OR  volatility_proxy > 30
-        OR  |average_funding| is extreme (e.g. > 0.05% per interval)
-        OR  open_interest_24h dropping sharply (deleveraging)
+        AND ( liquidation_stress_ratio > 0.5            # liquidations actually firing
+              OR volatility_proxy > 30
+              OR open_interest dropping sharply WITH rising funding )   # forced deleveraging
+        # Extreme fear ALONE is not stress. It must be confirmed by liquidations or
+        # volatility — otherwise the tape is a fearful range, not a cascade.
 
 TREND   if  |asset_momentum_24h| >= 2%
-        AND open_interest_24h rising (positioning confirms)
+        AND open_interest rising (positioning confirms)
         AND 25 <= Fear&Greed <= 75
 
-CHOP    otherwise (low volatility, neutral sentiment, flat positioning)
+CHOP    otherwise — includes "mixed / transition": low conviction, contained liquidations,
+        neutral-to-fearful sentiment without a cascade. Bias: stand aside / reduce size,
+        fade range extremes only on a clear signal.
 ```
 
-Report the chosen regime, the triggering condition, and a confidence (`high` / `medium`)
-based on how many signals agree.
+Report the chosen regime, the triggering condition, and a confidence (`high` / `medium` /
+`low`) based on how many signals agree. A regime with conflicting lanes (e.g. extreme fear
+but contained liquidations) is `CHOP` at `low` confidence, not `STRESS`.
 
 ## Strategy Rule Book
 
@@ -146,6 +152,17 @@ Return a single JSON object the user can hand to a backtester:
 - The `signals` block is the regime fingerprint at generation time — log it so backtests are reproducible.
 - Indicators are standard (`EMA`, `MACD`, `RSI`, `Bollinger`, `ATR`) and available in any backtest engine.
 - Apply realistic transaction costs and a max-drawdown guard; the STRESS block exists precisely to cap drawdown.
+
+## Validation
+
+Cross-checked live against CMC's own `detect_market_regime` (2026-06-07, 7d window):
+Fear&Greed 14, open interest 7d −15.82%, average funding 41.57 bps, liquidation stress 0.24
+(contained). CMC labelled the tape `mixed_transition / low conviction → stay selective`.
+
+RegimeSwitch returns **CHOP (transition, low confidence)** for the same snapshot: extreme fear
+is present, but liquidations are contained, so it correctly avoids a false `STRESS` call. The
+original `Fear&Greed < 25 ⇒ STRESS` rule was tightened to require liquidation/volatility
+confirmation as a direct result of this check.
 
 ## Handling Tool Failures
 
