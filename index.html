@@ -75,6 +75,16 @@
   .tag.risk{background:rgba(139,151,176,.15);color:var(--muted)}
   code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:12.5px;color:#cdd6ec}
 
+  .tokin{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:10px 12px;color:var(--txt);font-size:13px;margin-bottom:14px;font-family:inherit}
+  .tokin:focus{outline:none;border-color:var(--accent)}
+  .cand{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .cand:last-child{border-bottom:none}
+  .cand .sym{font-weight:800;width:62px}
+  .cand .rsn{color:var(--muted);font-size:13px}
+  .cand .ch{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:700}
+  .cand .ch.pos{color:var(--trend)} .cand .ch.neg{color:var(--stress)}
+
   .signal{display:flex;align-items:center;gap:16px}
   .sig-badge{font-size:26px;font-weight:900;padding:12px 22px;border-radius:14px;letter-spacing:1px}
   .sig-long{background:rgba(34,197,94,.15);color:var(--long)}
@@ -157,6 +167,12 @@
     </div>
   </div>
 
+  <div class="card" style="margin-top:16px">
+    <h2 data-i18n="candTitle"></h2>
+    <input id="tokFilter" class="tokin" placeholder="">
+    <div id="cands"></div>
+  </div>
+
   <footer>
     <div data-i18n-html="footer1"></div>
     <div class="flow">
@@ -187,7 +203,12 @@
       footer1:"Powered by <b>CoinMarketCap</b> Agent Hub · live snapshot 2026-06-07, cross-checked vs <code>detect_market_regime</code> · output: backtestable strategy spec",
       flow1:"CMC market data", flow2:"Regime detector", flow3:"Regime-specific rules", flow4:"Entry / exit signal",
       fearLbl:{low:"Extreme fear",mid:"Neutral",high:"Extreme greed"},
-      contained:"contained", conf:{high:"high",medium:"medium",low:"low"}
+      contained:"contained", conf:{high:"high",medium:"medium",low:"low"},
+      candTitle:"Token candidates · fit current regime",
+      candHint:"Filter tokens, comma-separated (e.g. BTC,ETH) — empty = auto top",
+      candNone:"no tokens match", notFound:"not in universe:",
+      avoid:"avoid / hold", longOversold:"long · oversold", shortOverbought:"short · overbought",
+      oversold:"oversold bounce", overbought:"overbought fade", momentum:"momentum", calmest:"calmest — defensive"
     },
     ru:{
       brandSub:"Адаптивный навык-стратегия на данных CMC — одна метастратегия, три рыночных режима",
@@ -204,9 +225,31 @@
       footer1:"На данных <b>CoinMarketCap</b> Agent Hub · живой снимок 2026-06-07, сверено с <code>detect_market_regime</code> · выход: backtestable strategy spec",
       flow1:"Данные рынка CMC", flow2:"Детектор режима", flow3:"Правила под режим", flow4:"Сигнал входа/выхода",
       fearLbl:{low:"Крайний страх",mid:"Нейтрально",high:"Крайняя жадность"},
-      contained:"сдержан", conf:{high:"высокая",medium:"средняя",low:"низкая"}
+      contained:"сдержан", conf:{high:"высокая",medium:"средняя",low:"низкая"},
+      candTitle:"Кандидаты-токены · под текущий режим",
+      candHint:"Фильтр токенов через запятую (напр. BTC,ETH) — пусто = авто-топ",
+      candNone:"нет подходящих токенов", notFound:"нет в списке:",
+      avoid:"вне рынка / холд", longOversold:"лонг · перепродан", shortOverbought:"шорт · перекуплен",
+      oversold:"отскок (перепродан)", overbought:"фейд (перекуплен)", momentum:"импульс", calmest:"спокойнейший — защита"
     }
   };
+
+  // ---------- token universe (real top-12 snapshot, 2026-06-07) ----------
+  const UNIVERSE = [
+    {symbol:"BTC",ch24h:1.61,ch7d:-16.32,vol24h:30608526216},
+    {symbol:"ETH",ch24h:3.78,ch7d:-19.92,vol24h:14582242325},
+    {symbol:"USDT",ch24h:0.01,ch7d:0.11,vol24h:63118906634},
+    {symbol:"BNB",ch24h:2.40,ch7d:-19.49,vol24h:1233750949},
+    {symbol:"USDC",ch24h:0.01,ch7d:0.02,vol24h:9171925313},
+    {symbol:"XRP",ch24h:2.62,ch7d:-16.54,vol24h:1987705281},
+    {symbol:"SOL",ch24h:3.14,ch7d:-22.42,vol24h:2726283594},
+    {symbol:"TRX",ch24h:2.41,ch7d:-5.98,vol24h:508974720},
+    {symbol:"HYPE",ch24h:-1.90,ch7d:-15.54,vol24h:673054821},
+    {symbol:"DOGE",ch24h:2.45,ch7d:-17.09,vol24h:724471660},
+    {symbol:"LEO",ch24h:-0.42,ch7d:-4.68,vol24h:1817077},
+    {symbol:"ZEC",ch24h:14.62,ch7d:-25.71,vol24h:1377547024}
+  ];
+  const STABLES = new Set(["USDT","USDC","DAI","FDUSD","TUSD","USDE","USD1","BUSD","USDD"]);
 
   // ---------- live CMC snapshot (detect_market_regime, 2026-06-07, 7d) ----------
   const cmc = {
@@ -308,6 +351,37 @@
     return {cls:"sig-flat", txt:"WAIT", note:N.chop};
   }
 
+  // ---------- token screener ----------
+  function screenTokens(regimeKey, symbols){
+    const t=T[lang];
+    let pool;
+    if(symbols.length){const w=new Set(symbols.map(s=>s.toUpperCase())); pool=UNIVERSE.filter(x=>w.has(x.symbol.toUpperCase()));}
+    else pool=UNIVERSE.filter(x=>!STABLES.has(x.symbol.toUpperCase()) && x.vol24h>=5e6);
+    const P=v=>(v>0?"+":"")+v+"%";
+    const scored=pool.map(x=>{
+      let cls,label,reason,score;
+      if(regimeKey==="trend"){score=Math.abs(0.6*x.ch24h+0.4*x.ch7d);cls=x.ch24h>=0?"long":"short";label=x.ch24h>=0?"LONG":"SHORT";reason=`${t.momentum} 24h ${P(x.ch24h)}, 7d ${P(x.ch7d)}`;}
+      else if(regimeKey==="stress"){score=-(Math.abs(x.ch24h)+Math.abs(x.ch7d)*0.3);cls="risk";label=t.avoid;reason=`${t.calmest}: 24h ${P(x.ch24h)}`;}
+      else{score=Math.abs(x.ch24h);cls=x.ch24h<0?"long":"short";label=x.ch24h<0?t.longOversold:t.shortOverbought;reason=`24h ${P(x.ch24h)} — ${x.ch24h<0?t.oversold:t.overbought}`;}
+      return {x,cls,label,reason,score};
+    });
+    scored.sort((a,b)=>b.score-a.score);
+    const missing=symbols.filter(s=>!UNIVERSE.some(x=>x.symbol.toUpperCase()===s.toUpperCase()));
+    return {picks:scored.slice(0,6),missing};
+  }
+
+  function renderCands(){
+    const t=T[lang];
+    const raw=document.getElementById("tokFilter").value.trim();
+    const symbols=raw?raw.split(",").map(s=>s.trim()).filter(Boolean):[];
+    const {picks,missing}=screenTokens(det.key,symbols);
+    const box=document.getElementById("cands");
+    if(!picks.length){box.innerHTML=`<div class="sig-note">${t.candNone}</div>`;return;}
+    box.innerHTML=picks.map(p=>
+      `<div class="cand"><span class="sym">${p.x.symbol}</span><span class="tag ${p.cls}">${p.label}</span><span class="rsn">${p.reason}</span><span class="ch ${p.x.ch24h>=0?'pos':'neg'}">${(p.x.ch24h>0?'+':'')+p.x.ch24h}%</span></div>`
+    ).join("") + (missing.length?`<div class="sig-note" style="margin-top:10px">${t.notFound} ${missing.join(", ")}</div>`:"");
+  }
+
   // ---------- render ----------
   let lang = "en";
   let activeTab;
@@ -351,6 +425,10 @@
 
     // rule book (current tab)
     showRules(activeTab || det.key);
+
+    // token candidates
+    document.getElementById("tokFilter").placeholder = t.candHint;
+    renderCands();
   }
 
   const tabs=document.querySelectorAll(".tab");
@@ -371,6 +449,9 @@
     document.querySelectorAll(".langtog button").forEach(x=>x.classList.toggle("active",x===b));
     render();
   }));
+
+  // token filter input
+  document.getElementById("tokFilter").addEventListener("input", renderCands);
 
   render();
 </script>
