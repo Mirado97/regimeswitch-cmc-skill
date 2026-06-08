@@ -9,6 +9,10 @@ live CMC signals, classifies the market into **TREND / CHOP / STRESS**, and emit
 > Track 2 deliverable: a CMC skill that turns market data into a trading strategy — a
 > backtestable spec, not a live-execution agent.
 
+**Live demo:** https://mirado97.github.io/regimeswitch-cmc-skill/ · **Skill:** [`SKILL.md`](skills/regime-switch-strategy/SKILL.md)
+
+![RegimeSwitch dashboard](proofs/demo_en.png)
+
 ## Why regime-switching
 
 A single strategy underperforms across conditions: trend rules get chopped up in ranges,
@@ -66,6 +70,8 @@ and emits the `Strategy Capsule` JSON. It then screens tokens (your `--tokens` l
 `--top` by market cap) and ranks those that fit the regime's playbook. Derivatives are not exposed
 keyless, so the prototype degrades gracefully (caps confidence, never asserts STRESS on sentiment alone).
 
+![Tests passing + live run](proofs/runtime.png)
+
 ### Two layers
 
 The **regime** is read from the whole market (the "weather"); the **rules + token screen** apply
@@ -93,6 +99,9 @@ return while delivering a higher Sharpe and a lower max drawdown on **every** on
 | SOL   | +99.8% / +91.6%      | 0.76 / 0.72    | −56.7% / −76.0% |
 
 The edge is **consistent risk-adjusted outperformance**, not a single cherry-picked asset.
+
+![ETH equity curve — RegimeSwitch vs Buy&Hold](proofs/equity_eth.png)
+![Multi-asset backtest](proofs/backtest.png)
 
 > Regime source: the live skill reads the regime from CMC sentiment / derivatives. Those are not
 > available as keyless history, so the backtest reconstructs the regime from price (volatility +
