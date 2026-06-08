@@ -24,11 +24,24 @@ CMC market data  →  Regime detector  →  Regime-specific rules  →  Entry/ex
    (sponsor)         (TREND/CHOP/STRESS)    (backtestable)
 ```
 
-## How it uses the sponsor stack
+## How it uses CoinMarketCap (concrete)
 
-- **CoinMarketCap Agent Hub (required sponsor capability):** all inputs come from CMC MCP tools
-  — Fear & Greed, BTC dominance, derivatives (open interest, funding, long/short), technical
-  analysis, and quotes. The skill is consumed by an LLM agent over **MCP**.
+RegimeSwitch is built entirely on CoinMarketCap data — two integration paths:
+
+**As a CMC skill (MCP, official format)** — `SKILL.md` declares these CMC tools in `allowed-tools`:
+- `get_global_metrics_latest` → Fear & Greed Index, BTC dominance, total market cap
+- `get_global_crypto_derivatives_metrics` → open interest, funding rate, long/short ratio, liquidation stress (drives the STRESS regime)
+- `get_crypto_marketcap_technical_analysis` → trend / volatility read
+- `get_crypto_quotes_latest` → per-asset 24h / 7d momentum
+- `get_crypto_listings_latest` → top-N token universe for the screener
+
+**Live in the prototype (CMC keyless public API, no key)** — `run.js --live` calls:
+- `/data-api/v3/fear-greed/chart` → current Fear & Greed
+- `/data-api/v3/global-metrics/quotes/latest` → dominance + market-cap change
+- `/data-api/v3/cryptocurrency/listing` → token universe (price, 24h/7d %, volume)
+
+The skill is consumed by an AI agent over **MCP**; the regime drives strategy selection (the
+derivatives lane is what flips the market into STRESS), and the strategy spec is the output.
 
 ## Repository layout
 
